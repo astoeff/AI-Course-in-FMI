@@ -26,7 +26,7 @@ def set_game_preconditions():
 
     return (number_of_rows, index_of_zero_in_solved_puzzle, Puzzle_node(puzzle, zero_position_in_input_puzzle))
 
-def find_puzzle_children(puzzle):
+def find_puzzle_children(puzzle, final_state_dict_values):
     puzzle_children = []
     puzzle_zero_x = puzzle.zero_position[0]
     puzzle_zero_y = puzzle.zero_position[1]
@@ -80,7 +80,7 @@ def find_puzzle_children(puzzle):
     finally:
         content = deepcopy(puzzle.content)
 
-    return puzzle_children
+    return sorted(puzzle_children, key=lambda x: x.calculate_heuristic(final_state_dict_values), reverse=True)
 
 def iterative_deepening_a_star(root_puzzle, final_state, final_state_dict_values):
     is_solved = False
@@ -92,7 +92,7 @@ def iterative_deepening_a_star(root_puzzle, final_state, final_state_dict_values
         #     break
         next_limit = limit + 2
         potential_limit = limit + 1
-        # print("#################################### Limit: ", limit)
+        #print("#################################### Limit: ", limit)
         stack = [root_puzzle]
         visited = [root_puzzle]
         while stack:
@@ -106,7 +106,7 @@ def iterative_deepening_a_star(root_puzzle, final_state, final_state_dict_values
                 final_state = current_puzzle
                 break
             
-            current_puzzle.children = find_puzzle_children(current_puzzle)
+            current_puzzle.children = find_puzzle_children(current_puzzle, final_state_dict_values)
             for child in current_puzzle.children:
                 if  child.calculate_heuristic(final_state_dict_values) < limit and child not in visited:
                     stack.append(child)
@@ -187,11 +187,15 @@ if __name__ == "__main__":
     # puzzle = Puzzle_node([[1, 2, 5], [7, 6, 4], [8, 0, 3]], (2,1))
     # puzzle = Puzzle_node([[0, 2, 6], [1, 5, 3], [7, 4, 8]], (0,0))
     start_time = time.time()
+    #final_state = create_final_state_of_puzzle_from_given_size_and_zero_position(4, -1)
     final_state = create_final_state_of_puzzle_from_given_size_and_zero_position(3, -1)
+
     # fn = Puzzle_node(final_state, (index_of_zero_in_solved_puzzle / size, index_of_zero_in_solved_puzzle % size))
+    #fn = Puzzle_node(final_state, (3, 3))
     fn = Puzzle_node(final_state, (2, 2))
+
     final_state_dict_values = fn.tile_number_position_dict
-    puzzle = Puzzle_node([[1,2,6], [0,5,3], [4, 7, 8]], (1,0))
+    puzzle = Puzzle_node([[1, 2, 6], [0, 5, 3], [7, 4, 8]], (1,0))
     #puzzle = Puzzle_node([[5, 6, 3, 4], [8, 0, 1, 15], [10, 7, 2, 11], [12, 9, 14, 13]], (1,1))
 
 
@@ -200,6 +204,7 @@ if __name__ == "__main__":
     # puzzle5 = Puzzle_node([[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15], [0,17,18,19,20], [16, 21, 22, 23, 24]], (3,0))
     # print(is_puzzle_solved(puzzle, fn))
     #print(puzzle.calculate_manhattan_distance(fn))
-    iterative_deepening_a_star(puzzle, fn, final_state_dict_values)
+    steps, directions = iterative_deepening_a_star(puzzle, fn, final_state_dict_values)
+    print_puzzle_solution(steps, directions)
     # assert puzzle.is_solvable, "Puzzle is not solvable!"
     print("--- %s seconds ---" % (time.time() - start_time))
