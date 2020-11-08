@@ -127,7 +127,9 @@ def iterative_deepening_a_star(root_puzzle, final_state, final_state_dict_values
 
     father = final_state.father_node
     steps = 0
-    directions = [final_state.movement_direction]
+    directions = []
+    if final_state.movement_direction:
+        directions.append(final_state.movement_direction)
     while father:
         # print('-----------------------------')
         # father.print_puzzle()
