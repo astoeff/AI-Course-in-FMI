@@ -2,7 +2,7 @@ from math import sqrt
 from copy import deepcopy
 
 from puzzle_node import Puzzle_node
-
+import time
 
 def set_game_preconditions():
     number_of_tiles = int(input("Enter 8, 15 or 24 as for number of the square tiles:"))
@@ -21,7 +21,7 @@ def set_game_preconditions():
         row_as_list = [int(i) for i in r.split(',')]
         puzzle.append(row_as_list)
         if 0 in row_as_list:
-            zero_position_in_input_puzzle = (puzzle.index(row_as_list), row_as_list.index(0))
+            zero_position_in_input_puzzle = (row, row_as_list.index(0))
         row_count += 1
 
     return (number_of_rows, index_of_zero_in_solved_puzzle, Puzzle_node(puzzle, zero_position_in_input_puzzle))
@@ -82,9 +82,9 @@ def find_puzzle_children(puzzle):
 
     return puzzle_children
 
-def execute_iterative_deepening_a_star(root_puzzle, final_state):
+def execute_iterative_deepening_a_star(root_puzzle, final_state, final_state_dict_values):
     is_solved = False
-    limit = root_puzzle.calculate_heuristic(final_state)
+    limit = root_puzzle.calculate_heuristic(final_state_dict_values)
     # count = 0
     while not is_solved:
         # count+=1
@@ -92,7 +92,7 @@ def execute_iterative_deepening_a_star(root_puzzle, final_state):
         #     break
         next_limit = limit + 1
         potential_limit = limit + 1
-        print("#################################### Limit: ", limit)
+        #print("#################################### Limit: ", limit)
         stack = [root_puzzle]
         visited = [root_puzzle]
         while stack:
@@ -107,7 +107,7 @@ def execute_iterative_deepening_a_star(root_puzzle, final_state):
             
             current_puzzle.children = find_puzzle_children(current_puzzle)
             for child in current_puzzle.children:
-                if  child.calculate_heuristic(final_state) < limit and child not in visited:
+                if  child.calculate_heuristic(final_state_dict_values) < limit and child not in visited:
                     stack.append(child)
                     visited.append(child)
                 # if next_limit > child.heuristic and child.heuristic > limit:
@@ -121,16 +121,16 @@ def execute_iterative_deepening_a_star(root_puzzle, final_state):
         # else:
         #     limit = potential_limit
         limit = next_limit
-    print("-------------------------REVERSED------------------------------------------")
+    # print("-------------------------REVERSED------------------------------------------")
 
     father = final_state.father_node
     steps = 0
     directions = [final_state.movement_direction]
     while father:
-        print('-----------------------------')
-        father.print_puzzle()
+        # print('-----------------------------')
+        # father.print_puzzle()
         directions.append(father.movement_direction)
-        print('-----------------------------')
+        # print('-----------------------------')
         father = father.father_node
         steps += 1
         
@@ -169,12 +169,13 @@ if __name__ == "__main__":
    
     # puzzle = Puzzle_node([[1, 2, 5], [7, 6, 4], [8, 0, 3]], (2,1))
     # puzzle = Puzzle_node([[0, 2, 6], [1, 5, 3], [7, 4, 8]], (0,0))
-
-    final_state = create_final_state_of_puzzle_from_given_size_and_zero_position(4, -1)
+    start_time = time.time()
+    final_state = create_final_state_of_puzzle_from_given_size_and_zero_position(3, -1)
     # fn = Puzzle_node(final_state, (index_of_zero_in_solved_puzzle / size, index_of_zero_in_solved_puzzle % size))
-    fn = Puzzle_node(final_state, (3, 3))
-    # puzzle = Puzzle_node([[1,2,6], [0,5,3], [7,4,8]], (1,0))
-    puzzle = Puzzle_node([[5, 6, 3, 4], [8, 0, 1, 15], [10, 7, 2, 11], [12, 9, 14, 13]], (1,1))
+    fn = Puzzle_node(final_state, (2, 2))
+    final_state_dict_values = fn.tile_number_position_dict
+    puzzle = Puzzle_node([[1,2,6], [0,5,3], [7,4,8]], (1,0))
+    #puzzle = Puzzle_node([[5, 6, 3, 4], [8, 0, 1, 15], [10, 7, 2, 11], [12, 9, 14, 13]], (1,1))
 
 
     # puzzle3 = Puzzle_node([[1,2,3], [0,5,6], [4,7,8]], (1,0))
@@ -182,5 +183,6 @@ if __name__ == "__main__":
     # puzzle5 = Puzzle_node([[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15], [0,17,18,19,20], [16, 21, 22, 23, 24]], (3,0))
     # print(is_puzzle_solved(puzzle, fn))
     #print(puzzle.calculate_manhattan_distance(fn))
-    execute_iterative_deepening_a_star(puzzle, fn)
+    execute_iterative_deepening_a_star(puzzle, fn, final_state_dict_values)
     # assert puzzle.is_solvable, "Puzzle is not solvable!"
+    print("--- %s seconds ---" % (time.time() - start_time))

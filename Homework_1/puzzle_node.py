@@ -25,9 +25,11 @@ class Puzzle_node():
     #         tile_x += 1
     #     return manhattan_distance
 
-    def calculate_manhattan_distance(self, final_state):
-        return  sum([(abs((list(self.tile_number_position_dict.values()))[i][0] - (list(final_state.tile_number_position_dict.values()))[i][0])\
-                    + abs((list(self.tile_number_position_dict.values()))[i][1] - (list(final_state.tile_number_position_dict.values()))[i][1])) for i in range(1, self.size * self.size)])
+    def calculate_manhattan_distance(self, final_state_dict_values):
+        lst_values_of_self = list(self.tile_number_position_dict.values())
+        lst_values_of_final_state = list(final_state_dict_values.values())
+        return  sum([abs(lst_values_of_self[i][0] - lst_values_of_final_state[i][0])\
+                    + abs(lst_values_of_self[i][1] - lst_values_of_final_state[i][1]) for i in range(1, self.size * self.size)])
 
         # m = 0
         # vals1 = list(self.tile_number_position_dict.values())
@@ -37,9 +39,9 @@ class Puzzle_node():
         # for i in range(0, self.size*self.size):
         #    m += self.
 
-    def calculate_heuristic(self, final_state):
+    def calculate_heuristic(self, final_state_dict_values):
         # print(self.calculate_manhattan_distance(final_state))
-        return self.distance_from_root + self.calculate_manhattan_distance(final_state)
+        return self.distance_from_root + self.calculate_manhattan_distance(final_state_dict_values)
 
     @property
     def tile_number_position_dict(self):
