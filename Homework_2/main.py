@@ -43,8 +43,8 @@ def create_board_for_asymmetric_board(n):
             odd_cols_index += 1
         d1[diagonal_index + i - board[i]] += 1
         d2[i + board[i]] += 1
-        print(d1[diagonal_index + i - board[i]])
-        print(d2[i + board[i]])
+        # print(d1[diagonal_index + i - board[i]])
+        # print(d2[i + board[i]])
         conflicts.append(d1[diagonal_index + i - board[i]] + d2[i + board[i]]  - 2)
 
     return board, d1, d2
@@ -52,8 +52,15 @@ def create_board_for_asymmetric_board(n):
 def calculate_conflicts_for_all_queens(n, board, d1, d2):
     conflicts = []
     diagonal_index = n - 1
+    # print('QUEEENS PER ROOOW')
     for i in range(n):
-        conflicts.append(d1[diagonal_index + i - board[i]] + d2[i + board[i]]  - 2)
+        queens_per_row = board.count(i)
+
+        #do not count current queen for conflicts
+        if queens_per_row > 0:
+            queens_per_row -= 1
+        # print(queens_per_row)
+        conflicts.append(d1[diagonal_index + i - board[i]] + d2[i + board[i]]  - 2 + queens_per_row)
 
     return conflicts
 
@@ -65,22 +72,22 @@ def get_col_of_queen_with_max_conflict(board, conflicts):
 
 def get_row_with_min_conflict_for_col(n, board, d1, d2, col):
     current_row_of_queen_with_max_conflicts = board[col]
-    print(current_row_of_queen_with_max_conflicts)
+    # print(current_row_of_queen_with_max_conflicts)
 
     min_conflicts = None
     min_conflicts_rows = []
     diagonal_index = n - 1
 
     all_conflicts_for_rows = []
-    print(d1)
-    print(d2)
+    # print(d1)
+    # print(d2)
     #go through all the rows
     for row in range(n):
         if row != current_row_of_queen_with_max_conflicts:
             queens_in_row = board.count(row)
             queens_in_d1 = d1[diagonal_index + row - col]
             queens_in_d2 = d2[row + col]
-            print(str(queens_in_d1) + ' ' + str(queens_in_d2))
+            # print(str(queens_in_d1) + ' ' + str(queens_in_d2))
             all_conflicts_for_position = queens_in_row + queens_in_d1 + queens_in_d2
             all_conflicts_for_rows.append(queens_in_row + queens_in_d1 + queens_in_d2)
             if min_conflicts:
@@ -92,16 +99,58 @@ def get_row_with_min_conflict_for_col(n, board, d1, d2, col):
             else:
                 min_conflicts = all_conflicts_for_position
                 min_conflicts_rows.append(row)
-    print(all_conflicts_for_rows)
-    print(min_conflicts_rows)
+    # print(all_conflicts_for_rows)
+    # print(min_conflicts_rows)
 
-    random_min_conflict_row = random.choice(min_conflict_rows)
+    random_min_conflict_row = random.choice(min_conflicts_rows)
     return random_min_conflict_row
 
+def update_board(n ,board, d1, d2, conflicts, previous_row, next_row, col):
+    # print(next_row)
+    diagonal_index = n -1
+
+    #update previous position diagonals
+    d1[diagonal_index + col - previous_row] -= 1
+    d2[previous_row + col] -= 1
+
+    #update new position diagonals
+    d1[diagonal_index + col - next_row] += 1
+    d2[next_row + col] += 1
+
+    #update board
+    board[col] = next_row
+
+    #update conflicts
+    conflicts = calculate_conflicts_for_all_queens(n, board, d1, d2)
+    # print(d1[diagonal_index + previous_row - col])
+    # print(d2[previous_row + col])
+    # print(d1[diagonal_index + next_row - col] )
+    # print(d2[next_row + col])
+
+    return board, d1, d2, conflicts
 
 def create_random_board(n):
     board = random.sample(range(0, n), n)
-    print(board)
+    d1 = [0 for i in range(n*2 - 1)]
+    d2 = [0 for i in range(n*2 - 1)]
+    conflicts = []
+    # even_cols_index = int(n/2)
+    # odd_cols_index = 0
+    diagonal_index = n - 1
+    for i in range(n):
+        # if i % 2 == 0:
+        #     board.append(even_cols_index)
+        #     even_cols_index += 1
+        # else:
+        #     board.append(odd_cols_index)
+        #     odd_cols_index += 1
+        d1[diagonal_index + i - board[i]] += 1
+        d2[i + board[i]] += 1
+        # print(d1[diagonal_index + i - board[i]])
+        # print(d2[i + board[i]])
+    # conflicts = calculate_conflicts_for_all_queens(n, board, d1, d2)
+
+    return board, d1, d2
 
 def check_is_solved(board, d1, d2):
     is_there_one_queen_per_row = len(set(board)) == len(board)
@@ -136,16 +185,61 @@ def main():
     if is_n_size_of_symmetric_board:
         solved_board_queens_positions = create_board_for_symmetric_board(n)
     else:
-        board, d1, d2 = create_board_for_asymmetric_board(n)
-        conflicts = calculate_conflicts_for_all_queens(n, board, d1, d2)
+        k = 7
+        is_solved = False
+        start_time = time.time()
+        while not is_solved:
+            print('RESTART')
+            board, d1, d2 = create_random_board(n)
+            conflicts = calculate_conflicts_for_all_queens(n, board, d1, d2)
+            if max(conflicts) == 0:
+                break
+
+            condition_for_restart = k * n
+            while condition_for_restart > 0:
+                
+                
+                # print('D1 initial: ', d1)
+                # print('D2 initial: ', d2)
+                
+                
+                        
+                    # print_board(n, board)
+                    # print(board)
+                    # print(d1)
+                    # print(d2)
+                    # print(conflicts)
+                col = get_col_of_queen_with_max_conflict(board, conflicts)
+                #print(col)
+                row = get_row_with_min_conflict_for_col(n, board, d1, d2, col)
+                board, d1, d2, conflicts = update_board(n ,board, d1, d2, conflicts, board[col], row, col)
+                if max(conflicts) == 0:
+                    is_solved = True
+                    break
+                    # print_board(n, board)
+                    # print(board)
+                    # print(d1)
+                    # print(d2)
+                    # print(conflicts)
+                # print('step: ' + str(condition_for_restart))
+                # print_board(n, board)
+                # print('Queens: ', board)
+                # print('D1: ', d1)
+                # print('D2: ', d2)
+                # print('Conflicts: ', conflicts)
+                condition_for_restart -= 1
         print_board(n, board)
-        print(board)
-        print(d1)
-        print(d2)
-        print(conflicts)
-        col = get_col_of_queen_with_max_conflict(board, conflicts)
-        print(col)
-        row = get_row_with_min_conflict_for_col(n, board, d1, d2, col)
+        print('Queens: ', board)
+        print('D1: ', d1)
+        print('D2: ', d2)
+        print('Conflicts: ', conflicts)
+
+           
+        # print_board(n, board)
+        # print(board)
+        # print(d1)
+        # print(d2)
+        # print(conflicts)
     # print(n, '---->', solved_board_queens_positions)
 
     # init = create_board(7)
@@ -162,8 +256,8 @@ def main():
     # d2 = init[2]
 
     # start_time = time.time()
-    # print(check_is_solved(board, d1, d2))
-    # print("--- %s seconds ---" % (time.time() - start_time))
+    print(check_is_solved(board, d1, d2))
+    print("--- %s seconds ---" % (time.time() - start_time))
 
 
 if __name__ == '__main__':
@@ -184,3 +278,4 @@ if __name__ == '__main__':
 #             odd_cols_index += 1
 
 #     return board, d1, d2
+# https://queens.lyndenlea.info/nqueens.php?pg=solutions&sol=14
