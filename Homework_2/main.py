@@ -26,26 +26,26 @@ def create_board_for_symmetric_board(n):
 
     return board
 
-def create_board_for_asymmetric_board(n):
-    board = []
-    d1 = [0 for i in range(n*2 - 1)]
-    d2 = [0 for i in range(n*2 - 1)]
-    conflicts = []
-    even_cols_index = int(n/2)
-    odd_cols_index = 0
-    diagonal_index = n - 1
-    for i in range(n):
-        if i % 2 == 0:
-            board.append(even_cols_index)
-            even_cols_index += 1
-        else:
-            board.append(odd_cols_index)
-            odd_cols_index += 1
-        d1[diagonal_index + i - board[i]] += 1
-        d2[i + board[i]] += 1
-        # print(d1[diagonal_index + i - board[i]])
-        # print(d2[i + board[i]])
-        conflicts.append(d1[diagonal_index + i - board[i]] + d2[i + board[i]]  - 2)
+# def create_board_for_asymmetric_board(n):
+#     board = []
+#     d1 = [0 for i in range(n*2 - 1)]
+#     d2 = [0 for i in range(n*2 - 1)]
+#     conflicts = []
+#     even_cols_index = int(n/2)
+#     odd_cols_index = 0
+#     diagonal_index = n - 1
+#     for i in range(n):
+#         if i % 2 == 0:
+#             board.append(even_cols_index)
+#             even_cols_index += 1
+#         else:
+#             board.append(odd_cols_index)
+#             odd_cols_index += 1
+#         d1[diagonal_index + i - board[i]] += 1
+#         d2[i + board[i]] += 1
+#         # print(d1[diagonal_index + i - board[i]])
+#         # print(d2[i + board[i]])
+#         conflicts.append(d1[diagonal_index + i - board[i]] + d2[i + board[i]]  - 2)
 
     return board, d1, d2
 
@@ -133,22 +133,10 @@ def create_random_board(n):
     board = random.sample(range(0, n), n)
     d1 = [0 for i in range(n*2 - 1)]
     d2 = [0 for i in range(n*2 - 1)]
-    conflicts = []
-    # even_cols_index = int(n/2)
-    # odd_cols_index = 0
     diagonal_index = n - 1
     for i in range(n):
-        # if i % 2 == 0:
-        #     board.append(even_cols_index)
-        #     even_cols_index += 1
-        # else:
-        #     board.append(odd_cols_index)
-        #     odd_cols_index += 1
         d1[diagonal_index + i - board[i]] += 1
         d2[i + board[i]] += 1
-        # print(d1[diagonal_index + i - board[i]])
-        # print(d2[i + board[i]])
-    # conflicts = calculate_conflicts_for_all_queens(n, board, d1, d2)
 
     return board, d1, d2
 
@@ -182,14 +170,17 @@ def main():
 
     #all sizes except for 8, 9, 14, 15, 20, 21, 26, 27 ... (6 % 2 == 2 or 6 % 3 == 3) follow a symmetric pattern for solution
     is_n_size_of_symmetric_board = n % 6 != 2 and n % 6 != 3
+    is_n_size_of_symmetric_board = False
     if is_n_size_of_symmetric_board:
         solved_board_queens_positions = create_board_for_symmetric_board(n)
     else:
-        k = 7
+        k = 12
         is_solved = False
         start_time = time.time()
+        c = 0
         while not is_solved:
-            print('RESTART')
+            c += 1
+            print(c)
             board, d1, d2 = create_random_board(n)
             conflicts = calculate_conflicts_for_all_queens(n, board, d1, d2)
             if max(conflicts) == 0:
@@ -197,85 +188,25 @@ def main():
 
             condition_for_restart = k * n
             while condition_for_restart > 0:
-                
-                
-                # print('D1 initial: ', d1)
-                # print('D2 initial: ', d2)
-                
-                
-                        
-                    # print_board(n, board)
-                    # print(board)
-                    # print(d1)
-                    # print(d2)
-                    # print(conflicts)
                 col = get_col_of_queen_with_max_conflict(board, conflicts)
-                #print(col)
                 row = get_row_with_min_conflict_for_col(n, board, d1, d2, col)
                 board, d1, d2, conflicts = update_board(n ,board, d1, d2, conflicts, board[col], row, col)
                 if max(conflicts) == 0:
+                    solved_board_queens_positions = board
                     is_solved = True
                     break
-                    # print_board(n, board)
-                    # print(board)
-                    # print(d1)
-                    # print(d2)
-                    # print(conflicts)
-                # print('step: ' + str(condition_for_restart))
-                # print_board(n, board)
-                # print('Queens: ', board)
-                # print('D1: ', d1)
-                # print('D2: ', d2)
-                # print('Conflicts: ', conflicts)
                 condition_for_restart -= 1
-        print_board(n, board)
-        print('Queens: ', board)
-        print('D1: ', d1)
-        print('D2: ', d2)
-        print('Conflicts: ', conflicts)
+        # print('Queens: ', board)
+        # print('D1: ', d1)
+        # print('D2: ', d2)
+        # print('Conflicts: ', conflicts)
 
-           
-        # print_board(n, board)
-        # print(board)
-        # print(d1)
-        # print(d2)
-        # print(conflicts)
-    # print(n, '---->', solved_board_queens_positions)
+        print("--- %s seconds ---" % (time.time() - start_time))
 
-    # init = create_board(7)
-    # board = init[0]
-    # for i in range(7):
-    #     row = ''
-    #     for j in range(7):
-    #         if board[j] == i:
-    #             row += 'X '
-    #         else:
-    #             row += '_ '
-    #     print(row)
-    # d1 = init[1]
-    # d2 = init[2]
-
-    # start_time = time.time()
-    print(check_is_solved(board, d1, d2))
-    print("--- %s seconds ---" % (time.time() - start_time))
+    if n < 100:
+         print_board(n, solved_board_queens_positions)
 
 
 if __name__ == '__main__':
    main()
-
-# def create_for_false(board):
-#     d1 = [0 for i in range(n*2 - 1)]
-#     d2 = [0 for i in range(n*2 - 1)]
-#     diagonal_index = n - 1
-#     for i in range(n):
-#         if i % 2 == 0:
-#             d1[diagonal_index + i - board[i]] += 1
-#             d2[i + board[i]] += 1
-#         else:
-#             board.append(odd_cols_index)
-#             d1[diagonal_index + i - board[i]] += 1
-#             d2[i + board[i]] += 1
-#             odd_cols_index += 1
-
-#     return board, d1, d2
 # https://queens.lyndenlea.info/nqueens.php?pg=solutions&sol=14
