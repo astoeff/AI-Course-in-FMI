@@ -49,45 +49,50 @@ def create_board_for_symmetric_board(n):
 
     return board, d1, d2
 
-def calculate_conflicts_for_all_queens(n, board, d1, d2):
+def calculate_conflicts_for_all_queens(n, board, queens_in_rows, d1, d2):
     conflicts = []
     diagonal_index = n - 1
-    # print('QUEEENS PER ROOOW')
     for i in range(n):
-        queens_per_row = board.count(i)
+        # queens_per_row = board.count(i)
+        queens_per_row = queens_in_rows[board[i]]
 
         #do not count current queen for conflicts
         if queens_per_row > 0:
             queens_per_row -= 1
-        # print(queens_per_row)
         conflicts.append(d1[diagonal_index + i - board[i]] + d2[i + board[i]]  - 2 + queens_per_row)
 
     return conflicts
 
 def get_col_of_queen_with_max_conflict(board, conflicts):
-    max_conflicts = max(conflicts)
-    cols_of_queens_with_max_conflict = [i for i,x in enumerate(conflicts) if x == max_conflicts]
+    max_conflicts = 0
+    cols_of_queens_with_max_conflict = []
+    index = 0
+    for i in conflicts:
+        if i > max_conflicts:
+            max_conflicts = i
+            cols_of_queens_with_max_conflict = [index]
+        elif i == max_conflicts:
+            cols_of_queens_with_max_conflict.append(index)
+        index += 1
     col_of_random_queen_of_queens_with_max_conflict = random.choice(cols_of_queens_with_max_conflict)
     return col_of_random_queen_of_queens_with_max_conflict
 
-def get_row_with_min_conflict_for_col(n, board, d1, d2, col):
+def get_row_with_min_conflict_for_col(n, board, queens_in_rows, d1, d2, col):
     current_row_of_queen_with_max_conflicts = board[col]
-    # print(current_row_of_queen_with_max_conflicts)
 
     min_conflicts = None
     min_conflicts_rows = []
     diagonal_index = n - 1
 
     all_conflicts_for_rows = []
-    # print(d1)
-    # print(d2)
+
     #go through all the rows
     for row in range(n):
         if row != current_row_of_queen_with_max_conflicts:
-            queens_in_row = board.count(row)
+            queens_in_row = queens_in_rows[row]
             queens_in_d1 = d1[diagonal_index + row - col]
             queens_in_d2 = d2[row + col]
-            # print(str(queens_in_d1) + ' ' + str(queens_in_d2))
+
             all_conflicts_for_position = queens_in_row + queens_in_d1 + queens_in_d2
             all_conflicts_for_rows.append(queens_in_row + queens_in_d1 + queens_in_d2)
             if min_conflicts:
@@ -105,8 +110,7 @@ def get_row_with_min_conflict_for_col(n, board, d1, d2, col):
     random_min_conflict_row = random.choice(min_conflicts_rows)
     return random_min_conflict_row
 
-def update_board(n ,board, d1, d2, conflicts, previous_row, next_row, col):
-    # print(next_row)
+def update_board(n, board, queens_in_rows, d1, d2, conflicts, previous_row, next_row, col):
     diagonal_index = n -1
 
     #update previous position diagonals
@@ -120,31 +124,33 @@ def update_board(n ,board, d1, d2, conflicts, previous_row, next_row, col):
     #update board
     board[col] = next_row
 
-    #update conflicts
-    conflicts = calculate_conflicts_for_all_queens(n, board, d1, d2)
-    # print(d1[diagonal_index + previous_row - col])
-    # print(d2[previous_row + col])
-    # print(d1[diagonal_index + next_row - col] )
-    # print(d2[next_row + col])
+    #update rows
+    queens_in_rows[previous_row] -= 1
+    queens_in_rows[next_row] += 1
 
-    return board, d1, d2, conflicts
+    #update conflicts
+    conflicts = calculate_conflicts_for_all_queens(n, board, queens_in_rows, d1, d2)
+
+    return board, d1, d2, queens_in_rows, conflicts
 
 def create_random_board(n):
     board = random.sample(range(0, n), n)
     d1 = [0 for i in range(n*2 - 1)]
     d2 = [0 for i in range(n*2 - 1)]
+    queens_in_rows = [0 for i in range(n)]
     diagonal_index = n - 1
     for i in range(n):
         d1[diagonal_index + i - board[i]] += 1
         d2[i + board[i]] += 1
+        queens_in_rows[board[i]] += 1
 
-    return board, d1, d2
+    return board, queens_in_rows, d1, d2
 
-def check_is_solved(board, d1, d2):
-    is_there_one_queen_per_row = len(set(board)) == len(board)
-    is_there_one_queen_per_d1 = max(d1) == 1
-    is_there_one_queen_per_d2 = max(d2) == 1
-    return is_there_one_queen_per_row and is_there_one_queen_per_d1 and is_there_one_queen_per_d2
+# def check_is_solved(board, d1, d2):
+#     is_there_one_queen_per_row = len(set(board)) == len(board)
+#     is_there_one_queen_per_d1 = max(d1) == 1
+#     is_there_one_queen_per_d2 = max(d2) == 1
+#     return is_there_one_queen_per_row and is_there_one_queen_per_d1 and is_there_one_queen_per_d2
 
 def print_board(n, board):
     first_row = '  '
@@ -174,39 +180,34 @@ def main():
     if is_n_size_of_symmetric_board:
         solved_board_queens_positions = create_board_for_symmetric_board(n)
     else:
-        k = 12
+        k = 8
         is_solved = False
         start_time = time.time()
         c = 0
         while not is_solved:
             c += 1
             print(c)
-            board, d1, d2 = create_random_board(n)
-            conflicts = calculate_conflicts_for_all_queens(n, board, d1, d2)
+            board, queens_in_rows, d1, d2 = create_random_board(n)
+            conflicts = calculate_conflicts_for_all_queens(n, board, queens_in_rows, d1, d2)
             if max(conflicts) == 0:
                 break
 
             condition_for_restart = k * n
             while condition_for_restart > 0:
                 col = get_col_of_queen_with_max_conflict(board, conflicts)
-                row = get_row_with_min_conflict_for_col(n, board, d1, d2, col)
-                board, d1, d2, conflicts = update_board(n ,board, d1, d2, conflicts, board[col], row, col)
+                row = get_row_with_min_conflict_for_col(n, board, queens_in_rows, d1, d2, col)
+                board, d1, d2, queens_in_rows, conflicts = update_board(n, board, queens_in_rows, d1, d2, conflicts, board[col], row, col)
                 if max(conflicts) == 0:
                     solved_board_queens_positions = board
                     is_solved = True
                     break
                 condition_for_restart -= 1
-        # print('Queens: ', board)
-        # print('D1: ', d1)
-        # print('D2: ', d2)
-        # print('Conflicts: ', conflicts)
 
         print("--- %s seconds ---" % (time.time() - start_time))
 
-    if n < 100:
+    if n < 40:
          print_board(n, solved_board_queens_positions)
 
 
 if __name__ == '__main__':
    main()
-# https://queens.lyndenlea.info/nqueens.php?pg=solutions&sol=14
