@@ -26,7 +26,7 @@ def create_board_for_symmetric_board(n):
 
     return board
 
-def create_board(n):
+def create_board_for_asymmetric_board(n):
     board = []
     d1 = [0 for i in range(n*2 - 1)]
     d2 = [0 for i in range(n*2 - 1)]
@@ -48,21 +48,21 @@ def create_board(n):
 
     return board, d1, d2
 
-def create_for_false(board):
-    d1 = [0 for i in range(n*2 - 1)]
-    d2 = [0 for i in range(n*2 - 1)]
-    diagonal_index = n - 1
-    for i in range(n):
-        if i % 2 == 0:
-            d1[diagonal_index + i - board[i]] += 1
-            d2[i + board[i]] += 1
-        else:
-            board.append(odd_cols_index)
-            d1[diagonal_index + i - board[i]] += 1
-            d2[i + board[i]] += 1
-            odd_cols_index += 1
+# def create_for_false(board):
+#     d1 = [0 for i in range(n*2 - 1)]
+#     d2 = [0 for i in range(n*2 - 1)]
+#     diagonal_index = n - 1
+#     for i in range(n):
+#         if i % 2 == 0:
+#             d1[diagonal_index + i - board[i]] += 1
+#             d2[i + board[i]] += 1
+#         else:
+#             board.append(odd_cols_index)
+#             d1[diagonal_index + i - board[i]] += 1
+#             d2[i + board[i]] += 1
+#             odd_cols_index += 1
 
-    return board, d1, d2
+#     return board, d1, d2
 
 def create_random_board(n):
     board = random.sample(range(0, n), n)
@@ -73,6 +73,21 @@ def check_is_solved(board, d1, d2):
     is_there_one_queen_per_d1 = max(d1) == 1
     is_there_one_queen_per_d2 = max(d2) == 1
     return is_there_one_queen_per_row and is_there_one_queen_per_d1 and is_there_one_queen_per_d2
+
+def print_board(n, board):
+    first_row = '  '
+    for i in range(n):
+        first_row += str(i) + ' '
+    print(first_row)
+
+    for i in range(n):
+        row = str(i) + ' '
+        for j in range(n):
+            if board[j] == i:
+                row += 'Q '
+            else:
+                row += '_ '
+        print(row)
 
 def main():
     n = int(input('Enter size of board: '))
@@ -86,9 +101,13 @@ def main():
     if is_n_size_of_symmetric_board:
         solved_board_queens_positions = create_board_for_symmetric_board(n)
     else:
-        board, d1, d2 = create_board(n)
-    
-    print(n, '---->', solved_board_queens_positions)
+        board, d1, d2 = create_board_for_asymmetric_board(n)
+        print_board(n, board)
+        print(board)
+        print(d1)
+        print(d2)
+
+    # print(n, '---->', solved_board_queens_positions)
 
     # init = create_board(7)
     # board = init[0]
