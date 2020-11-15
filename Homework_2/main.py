@@ -30,39 +30,39 @@ def create_board_for_asymmetric_board(n):
     board = []
     d1 = [0 for i in range(n*2 - 1)]
     d2 = [0 for i in range(n*2 - 1)]
+    conflicts = []
     even_cols_index = int(n/2)
     odd_cols_index = 0
     diagonal_index = n - 1
     for i in range(n):
-
         if i % 2 == 0:
             board.append(even_cols_index)
-            d1[diagonal_index + i - board[i]] += 1
-            d2[i + board[i]] += 1
             even_cols_index += 1
         else:
             board.append(odd_cols_index)
-            d1[diagonal_index + i - board[i]] += 1
-            d2[i + board[i]] += 1
             odd_cols_index += 1
+        d1[diagonal_index + i - board[i]] += 1
+        d2[i + board[i]] += 1
+        print(d1[diagonal_index + i - board[i]])
+        print(d2[i + board[i]])
+        conflicts.append(d1[diagonal_index + i - board[i]] + d2[i + board[i]]  - 2)
 
     return board, d1, d2
 
-# def create_for_false(board):
-#     d1 = [0 for i in range(n*2 - 1)]
-#     d2 = [0 for i in range(n*2 - 1)]
-#     diagonal_index = n - 1
-#     for i in range(n):
-#         if i % 2 == 0:
-#             d1[diagonal_index + i - board[i]] += 1
-#             d2[i + board[i]] += 1
-#         else:
-#             board.append(odd_cols_index)
-#             d1[diagonal_index + i - board[i]] += 1
-#             d2[i + board[i]] += 1
-#             odd_cols_index += 1
+def calculate_conflicts_for_all_queens(n, board, d1, d2):
+    conflicts = []
+    diagonal_index = n - 1
+    for i in range(n):
+        conflicts.append(d1[diagonal_index + i - board[i]] + d2[i + board[i]]  - 2)
 
-#     return board, d1, d2
+    return conflicts
+
+def get_col_of_queen_with_max_conflict(board, conflicts):
+    max_conflicts = max(conflicts)
+    cols_of_queens_with_max_conflict = [i for i,x in enumerate(conflicts) if x == max_conflicts]
+    col_of_random_queen_of_queens_with_max_conflict = random.choice(cols_of_queens_with_max_conflict)
+    return col_of_random_queen_of_queens_with_max_conflict
+    
 
 def create_random_board(n):
     board = random.sample(range(0, n), n)
@@ -102,10 +102,13 @@ def main():
         solved_board_queens_positions = create_board_for_symmetric_board(n)
     else:
         board, d1, d2 = create_board_for_asymmetric_board(n)
+        conflicts = calculate_conflicts_for_all_queens(n, board, d1, d2)
         print_board(n, board)
         print(board)
         print(d1)
         print(d2)
+        print(conflicts)
+        print(get_col_of_queen_with_max_conflict(board, conflicts))
 
     # print(n, '---->', solved_board_queens_positions)
 
@@ -129,3 +132,19 @@ def main():
 
 if __name__ == '__main__':
    main()
+
+# def create_for_false(board):
+#     d1 = [0 for i in range(n*2 - 1)]
+#     d2 = [0 for i in range(n*2 - 1)]
+#     diagonal_index = n - 1
+#     for i in range(n):
+#         if i % 2 == 0:
+#             d1[diagonal_index + i - board[i]] += 1
+#             d2[i + board[i]] += 1
+#         else:
+#             board.append(odd_cols_index)
+#             d1[diagonal_index + i - board[i]] += 1
+#             d2[i + board[i]] += 1
+#             odd_cols_index += 1
+
+#     return board, d1, d2
