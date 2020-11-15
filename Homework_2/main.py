@@ -62,7 +62,42 @@ def get_col_of_queen_with_max_conflict(board, conflicts):
     cols_of_queens_with_max_conflict = [i for i,x in enumerate(conflicts) if x == max_conflicts]
     col_of_random_queen_of_queens_with_max_conflict = random.choice(cols_of_queens_with_max_conflict)
     return col_of_random_queen_of_queens_with_max_conflict
-    
+
+def get_row_with_min_conflict_for_col(n, board, d1, d2, col):
+    current_row_of_queen_with_max_conflicts = board[col]
+    print(current_row_of_queen_with_max_conflicts)
+
+    min_conflicts = None
+    min_conflicts_rows = []
+    diagonal_index = n - 1
+
+    all_conflicts_for_rows = []
+    print(d1)
+    print(d2)
+    #go through all the rows
+    for row in range(n):
+        if row != current_row_of_queen_with_max_conflicts:
+            queens_in_row = board.count(row)
+            queens_in_d1 = d1[diagonal_index + row - col]
+            queens_in_d2 = d2[row + col]
+            print(str(queens_in_d1) + ' ' + str(queens_in_d2))
+            all_conflicts_for_position = queens_in_row + queens_in_d1 + queens_in_d2
+            all_conflicts_for_rows.append(queens_in_row + queens_in_d1 + queens_in_d2)
+            if min_conflicts:
+                if min_conflicts > all_conflicts_for_position:
+                    min_conflicts = all_conflicts_for_position
+                    min_conflicts_rows = [row]
+                elif min_conflicts == all_conflicts_for_position:
+                    min_conflicts_rows.append(row)
+            else:
+                min_conflicts = all_conflicts_for_position
+                min_conflicts_rows.append(row)
+    print(all_conflicts_for_rows)
+    print(min_conflicts_rows)
+
+    random_min_conflict_row = random.choice(min_conflict_rows)
+    return random_min_conflict_row
+
 
 def create_random_board(n):
     board = random.sample(range(0, n), n)
@@ -108,8 +143,9 @@ def main():
         print(d1)
         print(d2)
         print(conflicts)
-        print(get_col_of_queen_with_max_conflict(board, conflicts))
-
+        col = get_col_of_queen_with_max_conflict(board, conflicts)
+        print(col)
+        row = get_row_with_min_conflict_for_col(n, board, d1, d2, col)
     # print(n, '---->', solved_board_queens_positions)
 
     # init = create_board(7)
