@@ -1,5 +1,7 @@
 import random
 
+from dot import Dot
+
 def generate_n_different_random_dots(n):
     already_existing_dots_dict = {}
     generated_dots = []
@@ -11,13 +13,11 @@ def generate_n_different_random_dots(n):
         except KeyError as e:
             count += 1
             already_existing_dots_dict[dot] = True
-            generated_dots.append(dot)
+            generated_dots.append(Dot(dot))
         else:
             print("Povtarq se: ", dot)
 
     return generated_dots
-
-    return [ (random.randint(0, n - 1), random.randint(0, n - 1)) for i in range(n)]
 
 def main():
     n = int(input('Enter number of cities to be travelled: '))
@@ -26,7 +26,7 @@ def main():
     
     dots = generate_n_different_random_dots(n)
     for dot in dots:
-        print(dot)
+        dot.print_coordinates()
 
 if __name__ == '__main__':
     main()
