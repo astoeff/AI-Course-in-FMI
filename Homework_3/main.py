@@ -1,6 +1,7 @@
 import random
 
 from dot import Dot
+from route import Route
 
 def generate_n_different_random_dots(n):
     already_existing_dots_dict = {}
@@ -15,7 +16,8 @@ def generate_n_different_random_dots(n):
             already_existing_dots_dict[dot] = True
             generated_dots.append(Dot(dot))
         else:
-            print("Povtarq se: ", dot)
+            #Do not do anything, the dot is already generated
+            pass
 
     return generated_dots
 
@@ -25,8 +27,10 @@ def main():
     assert n <= 100, 'Number of cities must be <= 100!'
     
     dots = generate_n_different_random_dots(n)
-    for dot in dots:
-        dot.print_coordinates()
+    route = Route(dots)
+    print(route.distance)
+    route.print_dots()
+
 
 if __name__ == '__main__':
     main()
