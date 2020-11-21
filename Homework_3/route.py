@@ -10,3 +10,6 @@ class Route():
 	def print_dots(self):
 		for dot in self.dots:
 			dot.print_coordinates()
+
+	def __lt__(self, other):
+		return self.distance < other.distance
