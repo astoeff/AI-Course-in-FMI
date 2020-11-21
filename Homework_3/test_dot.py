@@ -1,11 +1,10 @@
 import unittest
 
 from dot import Dot
-# from decimal import *
 
 class TestDistanceToDot(unittest.TestCase):
     def test_with_given_non_different_dots_should_return_zero(self):
-        #ASSET
+        #ASSER
         coordinates = (0, 0)
         dot_1 = Dot(coordinates)
         dot_2 = Dot(coordinates)
