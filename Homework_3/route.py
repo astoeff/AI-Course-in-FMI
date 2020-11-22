@@ -13,3 +13,9 @@ class Route():
 
 	def __lt__(self, other):
 		return self.distance < other.distance
+
+	def __eq__(self, other):
+		return self.dots == other.dots
+
+	def __str__(self):
+		return str(self.dots)

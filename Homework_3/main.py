@@ -24,6 +24,39 @@ def generate_n_different_random_dots(n):
 
     return generated_dots
 
+def geenrate_child(first_half_parent, second_parent, number_of_genes_from_first_half_parent):
+    child = first_half_parent
+
+    first_half_second_parent = second_parent.dots[:number_of_genes_from_first_half_parent]
+    second_half_second_parent = second_parent.dots[number_of_genes_from_first_half_parent:]
+
+    for gene in second_half_second_parent:
+        if gene not in child:
+            child.append(gene)
+
+    #can be optimised
+    if len(child) != len(second_parent.dots):
+        for gene in first_half_second_parent:
+            if gene not in child:
+                child.append(gene)
+
+    return Route([dot.coordinates for dot in child])
+
+def crossover(parent_1, parent_2, n):
+    '''The function creates children from 2 parents
+        parameters:   parent_1, parent_2, n
+        return value: [] of children (1 or 2)'''
+
+    number_of_sequentive_genes_from_parent_for_reproduction = int(n / 2) if n % 2 == 0 else int(n / 2) + 1
+    first_part_of_parent_1 = parent_1.dots[:number_of_sequentive_genes_from_parent_for_reproduction]
+    first_part_of_parent_2 = parent_2.dots[:number_of_sequentive_genes_from_parent_for_reproduction]
+    # print(first_part_of_parent_1)
+
+    child_1 = geenrate_child(first_part_of_parent_1, parent_2, number_of_sequentive_genes_from_parent_for_reproduction)
+    child_2 = geenrate_child(first_part_of_parent_2, parent_1, number_of_sequentive_genes_from_parent_for_reproduction)
+
+    return child_1, child_2
+
 def main():
     n = int(input('Enter number of cities to be travelled: '))
 
@@ -44,7 +77,10 @@ def main():
     #sort the sample
     sample_of_individuals.sort(key=lambda x: x.distance)
 
-    if n <= 8:
+    best_individual = sample_of_individuals[0]
+    best_distance = best_individual.distance
+
+    if False:
         print([i.coordinates for i in sample_of_individuals[0].dots])
         print(sample_of_individuals[0].distance)
 
@@ -55,10 +91,29 @@ def main():
         individuals_preserved_for_next_generation = sample_of_individuals[:number_of_individuals_preserved]
         
         number_of_children_needed = n - number_of_individuals_preserved
-        number_of_pair_of_parents = 0
+        index_of_pair_of_parents = 0
+        children_reproduced = []
         while number_of_children_needed > 0:
-            #create child from pair
-            pass
+            #create 2 children from pair
+            children_from_crossover = crossover(sample_of_individuals[index_of_pair_of_parents], sample_of_individuals[index_of_pair_of_parents + 1], n)
+            children_reproduced.append(children_from_crossover[0])
+            children_reproduced.append(children_from_crossover[1])
+            
+            #increase with 2 because for crossover 2 parents are needed
+            index_of_pair_of_parents += 2
+
+            #decrease with 2 because 2 children are reproduced from crossover
+            number_of_children_needed -= 2
+
+        next_generation_individuals = []
+        for i in individuals_preserved_for_next_generation:
+            d = [do.coordinates for do in i.dots]
+            r = Route(d)
+            next_generation_individuals.append(r)
+
+        for i in children_reproduced:
+            next_generation_individuals.append(i)
+
 
 
         count_for_exctremum_reached = 5

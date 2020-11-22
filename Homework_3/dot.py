@@ -15,3 +15,6 @@ class Dot():
 
     def print_coordinates(self):
         print(self.coordinates)
+
+    def __str__(self):
+        return self.coordinates
