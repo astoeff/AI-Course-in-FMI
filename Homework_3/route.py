@@ -1,4 +1,5 @@
 from dot import Dot
+
 class Route():
 	def __init__(self, dots):
 		for dot in dots:
