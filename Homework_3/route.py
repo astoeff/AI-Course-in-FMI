@@ -1,5 +1,8 @@
+from dot import Dot
 class Route():
 	def __init__(self, dots):
+		for dot in dots:
+			assert type(dot) == Dot, 'Greshen vhod brat'
 		self.dots = dots
 		self.length = len(dots)
 

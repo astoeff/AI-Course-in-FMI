@@ -40,7 +40,7 @@ def geenrate_child(first_half_parent, second_parent, number_of_genes_from_first_
             if gene not in child:
                 child.append(gene)
 
-    return Route([dot.coordinates for dot in child])
+    return Route([dot for dot in child])
 
 def crossover(parent_1, parent_2, n):
     '''The function creates children from 2 parents
@@ -57,6 +57,37 @@ def crossover(parent_1, parent_2, n):
 
     return child_1, child_2
 
+def reproduce(sample_of_individuals, n):
+    #get the first 25% from the sample for reproduction
+    number_of_individuals_preserved = int(n/4 if n % 2 == 0 else n/4 + 1)
+    individuals_preserved_for_next_generation = sample_of_individuals[:number_of_individuals_preserved]
+    
+    number_of_children_needed = n - number_of_individuals_preserved
+    index_of_pair_of_parents = 0
+    children_reproduced = []
+    while number_of_children_needed > 0:
+        #create 2 children from pair
+        children_from_crossover = crossover(sample_of_individuals[index_of_pair_of_parents], sample_of_individuals[index_of_pair_of_parents + 1], n)
+        children_reproduced.append(children_from_crossover[0])
+        children_reproduced.append(children_from_crossover[1])
+        
+        #increase with 2 because for crossover 2 parents are needed
+        index_of_pair_of_parents += 2
+
+        #decrease with 2 because 2 children are reproduced from crossover
+        number_of_children_needed -= 2
+
+    next_generation_individuals = []
+    for i in individuals_preserved_for_next_generation:
+        d = [do for do in i.dots]
+        r = Route(d)
+        next_generation_individuals.append(r)
+
+    for i in children_reproduced:
+        next_generation_individuals.append(i)
+
+    return next_generation_individuals
+
 def main():
     n = int(input('Enter number of cities to be travelled: '))
 
@@ -65,7 +96,7 @@ def main():
     dots = generate_n_different_random_dots(n)
     initial_route = Route(dots)
 
-    number_of_individuals_in_sample = pow(n, 2) if n > 10 else factorial(n)
+    number_of_individuals_in_sample = pow(n, 2) if n > 8 else factorial(n)
 
     sample_of_individuals = []
 
@@ -80,65 +111,35 @@ def main():
     best_individual = sample_of_individuals[0]
     best_distance = best_individual.distance
 
+    number_of_sequentive_times_with_equal_best_distance_for_exctremum_reached = 7
+    current_number_of_sequentive_times_with_equal_best_distance = 0
+    count_for_execution_of_algorithm = 1000
+    is_best_result_achieved = False
     if False:
-        print([i.coordinates for i in sample_of_individuals[0].dots])
-        print(sample_of_individuals[0].distance)
-
+        print(best_individual)
+        print(best_distance)
     else:
+       while not is_best_result_achieved:
+            next_generation = reproduce(sample_of_individuals, n)
+            # print(type(next_generation[0].dots[0]))
+            # break
+            next_generation.sort(key=lambda x: x.distance)
+            next_generation_best_individual = next_generation[0]
+            next_generation_best_distance = next_generation_best_individual.distance
 
-        #get the first 25% from the sample for reproduction
-        number_of_individuals_preserved = int(n/4 if n % 2 == 0 else n/4 + 1)
-        individuals_preserved_for_next_generation = sample_of_individuals[:number_of_individuals_preserved]
-        
-        number_of_children_needed = n - number_of_individuals_preserved
-        index_of_pair_of_parents = 0
-        children_reproduced = []
-        while number_of_children_needed > 0:
-            #create 2 children from pair
-            children_from_crossover = crossover(sample_of_individuals[index_of_pair_of_parents], sample_of_individuals[index_of_pair_of_parents + 1], n)
-            children_reproduced.append(children_from_crossover[0])
-            children_reproduced.append(children_from_crossover[1])
-            
-            #increase with 2 because for crossover 2 parents are needed
-            index_of_pair_of_parents += 2
+            if next_generation_best_distance == best_distance:
+                current_number_of_sequentive_times_with_equal_best_distance += 1
+            else:
+                current_number_of_sequentive_times_with_equal_best_distance = 0
 
-            #decrease with 2 because 2 children are reproduced from crossover
-            number_of_children_needed -= 2
-
-        next_generation_individuals = []
-        for i in individuals_preserved_for_next_generation:
-            d = [do.coordinates for do in i.dots]
-            r = Route(d)
-            next_generation_individuals.append(r)
-
-        for i in children_reproduced:
-            next_generation_individuals.append(i)
-
-
-
-        count_for_exctremum_reached = 5
-        count_for_execution_of_algorithm = 1000
-        # for i in sample_of_individuals:
-        #     i.print_dots()
-        #     print(i.distance)
-
-
-    # permutations = itertools.permutations(dots)
-    # r1 = Route((next(permutations)))
-    # r2 = Route(next(permutations))
-    # r3 = Route(next(permutations))
-    # r4 = Route(next(permutations))
-
-    # print('Route 1 ----------------------')
-    # r1.print_dots()
-    # print('Route 2 ----------------------')
-    # r2.print_dots()
-    # print('Route 3 ----------------------')
-    # r3.print_dots()
-    # print('Route 4 ----------------------')
-    # r4.print_dots()
-
-
+            sample_of_individuals = next_generation
+            best_individual = next_generation_best_individual
+            best_distance = next_generation_best_distance
+            count_for_execution_of_algorithm -= 1
+            is_best_result_achieved = (current_number_of_sequentive_times_with_equal_best_distance == number_of_sequentive_times_with_equal_best_distance_for_exctremum_reached)\
+                              or count_for_execution_of_algorithm == 0
+            print(best_distance)
+       
 
 if __name__ == '__main__':
     main()
