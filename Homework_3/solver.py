@@ -3,6 +3,7 @@ from math import factorial
 import itertools
 from route import Route
 from dot import Dot
+
 def find_best_path(dots):
     permutations = itertools.permutations(dots)
     routes = []
@@ -15,9 +16,8 @@ def find_best_path(dots):
 
 
 def main():
-    dots_tuples = [(0, 4), (1, 3), (3, 1), (4, 3), (5, 3), (6, 3), (6, 2), (7, 0)]
+    dots_tuples = [(2, 2), (1, 2), (2, 0), (0, 2)]
     dots = [Dot(i) for i in dots_tuples]
-    # dots = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     find_best_path(dots)
 
 if __name__ == '__main__':

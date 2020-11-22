@@ -17,4 +17,4 @@ class Dot():
         print(self.coordinates)
 
     def __str__(self):
-        return self.coordinates
+        return str(self.coordinates)

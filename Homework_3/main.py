@@ -24,6 +24,28 @@ def generate_n_different_random_dots(n):
 
     return generated_dots
 
+def read_input_parameters():
+    n = int(input('Enter number of cities to be travelled: '))
+
+    assert n <= 100, 'Number of cities must be <= 100!'    
+    return n
+
+def generate_initial_route(n):
+    dots = generate_n_different_random_dots(n)
+    print([dot.coordinates for dot in dots])
+    initial_route = Route(dots)
+    return initial_route
+
+def create_diverse_sample_from_random_individuals(number_of_individuals_in_sample, initial_individual):
+    sample_of_individuals = []
+
+    for i in range(number_of_individuals_in_sample):
+        dots = deepcopy(initial_individual.dots)
+        random.shuffle(dots)
+        sample_of_individuals.append(Route(dots))
+
+    return sample_of_individuals
+
 def geenrate_child(first_half_parent, second_parent, number_of_genes_from_first_half_parent):
     child = first_half_parent
 
@@ -88,22 +110,19 @@ def reproduce(sample_of_individuals, n):
 
     return next_generation_individuals
 
+def find_best_individual():
+    pass
+
 def main():
-    n = int(input('Enter number of cities to be travelled: '))
+    n = read_input_parameters()
 
-    assert n <= 100, 'Number of cities must be <= 100!'
-    
-    dots = generate_n_different_random_dots(n)
-    initial_route = Route(dots)
+    initial_route = generate_initial_route(n)
 
+    #formula calculating how many individuals to be in sample
     number_of_individuals_in_sample = pow(n, 2) if n > 8 else factorial(n)
 
-    sample_of_individuals = []
-
-    for i in range(number_of_individuals_in_sample):
-        dots = deepcopy(initial_route.dots)
-        random.shuffle(dots)
-        sample_of_individuals.append(Route(dots))
+    #create diverse sample
+    sample_of_individuals = create_diverse_sample_from_random_individuals(number_of_individuals_in_sample, initial_route)
 
     #sort the sample
     sample_of_individuals.sort(key=lambda x: x.distance)
@@ -121,8 +140,6 @@ def main():
     else:
        while not is_best_result_achieved:
             next_generation = reproduce(sample_of_individuals, n)
-            # print(type(next_generation[0].dots[0]))
-            # break
             next_generation.sort(key=lambda x: x.distance)
             next_generation_best_individual = next_generation[0]
             next_generation_best_distance = next_generation_best_individual.distance
@@ -139,7 +156,8 @@ def main():
             is_best_result_achieved = (current_number_of_sequentive_times_with_equal_best_distance == number_of_sequentive_times_with_equal_best_distance_for_exctremum_reached)\
                               or count_for_execution_of_algorithm == 0
             print(best_distance)
-       
+    
+    print([str(i) for i in best_individual.dots])
 
 if __name__ == '__main__':
     main()

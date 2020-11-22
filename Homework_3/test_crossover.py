@@ -33,10 +33,9 @@ class TestCrossover(unittest.TestCase):
         route_2 = Route(dots_route_2)
 
         #expected_children
-        child_1 = Route([(0, 2), (2, 1), (1, 1), (2, 2)])
-        child_2 = Route([(2, 2), (0, 2), (1, 1), (2, 1)])
-        expected_children = (child_1, child_2)
-        
+        child_1 = Route([Dot((0, 2)), Dot((2, 1)), Dot((1, 1)), Dot((2, 2))])
+        child_2 = Route([Dot((2, 2)), Dot((0, 2)), Dot((1, 1)), Dot((2, 1))])
+        expected_children = (child_1, child_2)        
 
         #ACT
         result_children = crossover(route_1, route_2, n)
@@ -68,10 +67,9 @@ class TestCrossover(unittest.TestCase):
         route_2 = Route(dots_route_2)
 
         #expected_children
-        child_1 = Route([(0, 2), (2, 1), (2, 2)])
-        child_2 = Route([(2, 2), (0, 2), (2, 1)])
-        expected_children = (child_1, child_2)
-        
+        child_1 = Route([Dot((0, 2)), Dot((2, 1)), Dot((2, 2))])
+        child_2 = Route([Dot((2, 2)), Dot((0, 2)), Dot((2, 1))])
+        expected_children = (child_1, child_2)        
 
         #ACT
         result_children = crossover(route_1, route_2, n)
