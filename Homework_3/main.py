@@ -32,7 +32,9 @@ def read_input_parameters():
 
 def generate_initial_route(n):
     dots = generate_n_different_random_dots(n)
-    print([dot.coordinates for dot in dots])
+    #uncomment for shiwing initial dots when using solver
+    #print([dot.coordinates for dot in dots])
+    
     initial_route = Route(dots)
     return initial_route
 
@@ -122,7 +124,8 @@ def find_best_individual(sample_of_individuals, n):
     if optimisation_condition:
         pass
     else:
-        number_of_sequentive_times_with_equal_best_distance_for_exctremum_reached = 7
+        #works best with 10
+        number_of_sequentive_times_with_equal_best_distance_for_exctremum_reached = 40
         current_number_of_sequentive_times_with_equal_best_distance = 0
         count_for_execution_of_algorithm = 1000
         is_best_result_achieved = False
@@ -144,7 +147,21 @@ def find_best_individual(sample_of_individuals, n):
             is_best_result_achieved = (current_number_of_sequentive_times_with_equal_best_distance == number_of_sequentive_times_with_equal_best_distance_for_exctremum_reached)\
                               or count_for_execution_of_algorithm == 0
             #uncomment for showing best distance for each generation
-            # print(best_distance)
+            #print(best_distance)
+
+            #step 10
+            if count_for_execution_of_algorithm == 990:
+                print('Step 10: ', best_distance)
+            #step 20
+            elif count_for_execution_of_algorithm == 980:
+                print('Step 20: ', best_distance)
+            #step 30
+            elif count_for_execution_of_algorithm == 970:
+                print('Step 30: ', best_distance)
+            #step 40
+            elif count_for_execution_of_algorithm == 960:
+                print('Step 40: ', best_distance)
+
     return best_individual
     
 def main():
