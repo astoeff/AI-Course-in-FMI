@@ -110,35 +110,23 @@ def reproduce(sample_of_individuals, n):
 
     return next_generation_individuals
 
-def find_best_individual():
-    pass
-
-def main():
-    n = read_input_parameters()
-
-    initial_route = generate_initial_route(n)
-
-    #formula calculating how many individuals to be in sample
-    number_of_individuals_in_sample = pow(n, 2) if n > 8 else factorial(n)
-
-    #create diverse sample
-    sample_of_individuals = create_diverse_sample_from_random_individuals(number_of_individuals_in_sample, initial_route)
-
-    #sort the sample
-    sample_of_individuals.sort(key=lambda x: x.distance)
-
+def find_best_individual(sample_of_individuals, n):
     best_individual = sample_of_individuals[0]
     best_distance = best_individual.distance
 
-    number_of_sequentive_times_with_equal_best_distance_for_exctremum_reached = 7
-    current_number_of_sequentive_times_with_equal_best_distance = 0
-    count_for_execution_of_algorithm = 1000
-    is_best_result_achieved = False
-    if False:
-        print(best_individual)
-        print(best_distance)
+    optimisation_condition = False
+
+    #uncomment if you want to not use genetic algorithm for n <= 8
+    #optimisation_condition = n <= 8
+
+    if optimisation_condition:
+        pass
     else:
-       while not is_best_result_achieved:
+        number_of_sequentive_times_with_equal_best_distance_for_exctremum_reached = 7
+        current_number_of_sequentive_times_with_equal_best_distance = 0
+        count_for_execution_of_algorithm = 1000
+        is_best_result_achieved = False
+        while not is_best_result_achieved:
             next_generation = reproduce(sample_of_individuals, n)
             next_generation.sort(key=lambda x: x.distance)
             next_generation_best_individual = next_generation[0]
@@ -155,9 +143,31 @@ def main():
             count_for_execution_of_algorithm -= 1
             is_best_result_achieved = (current_number_of_sequentive_times_with_equal_best_distance == number_of_sequentive_times_with_equal_best_distance_for_exctremum_reached)\
                               or count_for_execution_of_algorithm == 0
-            print(best_distance)
+            #uncomment for showing best distance for each generation
+            # print(best_distance)
+    return best_individual
     
+def main():
+    n = read_input_parameters()
+
+    initial_route = generate_initial_route(n)
+
+    #formula calculating how many individuals to be in sample
+    number_of_individuals_in_sample = pow(n, 2) if n > 8 else factorial(n)
+
+    #create diverse sample
+    sample_of_individuals = create_diverse_sample_from_random_individuals(number_of_individuals_in_sample, initial_route)
+
+    #sort the sample
+    sample_of_individuals.sort(key=lambda x: x.distance)
+
+    #execute algorithm
+    best_individual = find_best_individual(sample_of_individuals, n)
+
+    #Output
+    print('Best distance', best_individual.distance)
     print([str(i) for i in best_individual.dots])
+
 
 if __name__ == '__main__':
     main()

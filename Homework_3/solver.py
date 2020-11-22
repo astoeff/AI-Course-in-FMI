@@ -16,7 +16,7 @@ def find_best_path(dots):
 
 
 def main():
-    dots_tuples = [(2, 2), (1, 2), (2, 0), (0, 2)]
+    dots_tuples = [(5, 0), (5, 2), (5, 4), (5, 1), (0, 2), (4, 3)]
     dots = [Dot(i) for i in dots_tuples]
     find_best_path(dots)
 

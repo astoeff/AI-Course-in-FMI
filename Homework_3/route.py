@@ -2,7 +2,7 @@ from dot import Dot
 class Route():
 	def __init__(self, dots):
 		for dot in dots:
-			assert type(dot) == Dot, 'Greshen vhod brat'
+			assert type(dot) == Dot, 'Dots must be of type [<Dot>] not [<tuple>]'
 		self.dots = dots
 		self.length = len(dots)
 
