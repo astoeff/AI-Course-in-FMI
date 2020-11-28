@@ -35,8 +35,11 @@ def main():
     inputted_value = read_who_is_first_input_from_console()
     is_player_first = check_if_player_is_first(inputted_value)
     initial_board_list_of_values = INITIAL_VERSION_OF_BOARD
-    board = Board(initial_board_list_of_values)
-    player_moves(board)
-    
+    # board = Board(initial_board_list_of_values)
+    # board = Board([['_', '_', '_'], ['X', 'X', 'O'], ['O', 'O', 'O']])
+    board = Board([['X', 'X', 'X'], ['O', 'O', '_'], ['O', '_', '_']])
+    # player_moves(board)
+    print(board.check_if_solved_by_row())
+
 if __name__ == '__main__':
     main()
