@@ -30,35 +30,33 @@ def player_moves(board):
     while not is_position_available:
         position = read_player_position_input_from_console()
         is_position_available = check_if_position_is_available(board, position)
-    board.update(position, colored(PLAYER_SIGN_ON_BOARD_CHAR, 'green'))
-    # board.print()
+    board.update(position, PLAYER_SIGN_ON_BOARD_CHAR)
+    return board
 
 def max_alpha_beta(board, alpha, beta):
     maxv = -2
     px = None
     py = None
 
-    result = board.check_if_final_state()
+    result = board.is_end()
 
     if result == 'X':
         return (-1, 0, 0)
     elif result == 'O':
         return (1, 0, 0)
-    elif result == '.':
+    elif result == '_':
         return (0, 0, 0)
 
-    board_copy = deepcopy(board)
     for i in range(0, 3):
         for j in range(0, 3):
-            if board_copy.board[i][j] == '_':
-                # print('YEEEEEEEEEEEEEEYYEYYEYYEYEYEYEYEY')
-                board_copy.board[i][j] = 'O'
-                (m, min_i, in_j) = min_alpha_beta(board_copy, alpha, beta)
+            if board.board[i][j] == '_':
+                board.board[i][j] = 'O'
+                (m, min_i, in_j) = min_alpha_beta(board, alpha, beta)
                 if m > maxv:
                     maxv = m
                     px = i
                     py = j
-                board_copy.board[i][j] = '_'
+                board.board[i][j] = '_'
 
                 # Next two ifs in Max and Min are the only difference between regular algorithm and minimax
                 if maxv >= beta:
@@ -66,8 +64,7 @@ def max_alpha_beta(board, alpha, beta):
 
                 if maxv > alpha:
                     alpha = maxv
-    # print('IN function')
-    # print(px, py)
+
     return (maxv, px, py)
 
 def min_alpha_beta(board, alpha, beta):
@@ -76,26 +73,25 @@ def min_alpha_beta(board, alpha, beta):
     qx = None
     qy = None
 
-    result = board.check_if_final_state()
+    result = board.is_end()
 
     if result == 'X':
         return (-1, 0, 0)
     elif result == 'O':
         return (1, 0, 0)
-    elif result == '.':
+    elif result == '_':
         return (0, 0, 0)
 
-    board_copy = deepcopy(board)
     for i in range(0, 3):
         for j in range(0, 3):
-            if board_copy.board[i][j] == '_':
-                board_copy.board[i][j] = 'X'
-                (m, max_i, max_j) = max_alpha_beta(board_copy, alpha, beta)
+            if board.board[i][j] == '_':
+                board.board[i][j] = 'X'
+                (m, max_i, max_j) = max_alpha_beta(board, alpha, beta)
                 if m < minv:
                     minv = m
                     qx = i
                     qy = j
-                board_copy.board[i][j] = '_'
+                board.board[i][j] = '_'
 
                 if minv <= alpha:
                     return (minv, qx, qy)
@@ -125,9 +121,23 @@ def main():
         current_player_on_turn = COMPUTER_IS_ON_TURN_STRING
 
     board.print()
-    while board.solved_sign == EMPTY_POSITION_ON_BOARD_CHAR:
+    while True:
+        result = board.is_end()
+
+        # Printing the appropriate message if the game has ended
+        if result != None:
+            if result == 'X':
+                print('The winner is X!')
+            elif result == 'O':
+                print('The winner is O!')
+            elif result == '.':
+                print("It's a tie!")
+
+            # self.initialize_game()
+            return
+
         if current_player_on_turn == PLAYER_IS_ON_TURN_STRING:
-            player_moves(board)
+            board = player_moves(board)
             current_player_on_turn = COMPUTER_IS_ON_TURN_STRING
         else:
             # print('BOARD FOR BOT')
@@ -136,10 +146,9 @@ def main():
             board_copy = deepcopy(board)
             (m, px, py) = max_alpha_beta(board_copy, -2, 2)
             # print(px, py)
-            board.update((px, py), colored('O', 'red'))
+            board.update((px, py), 'O')
             # board.board[px][py] = 'O'
             current_player_on_turn = PLAYER_IS_ON_TURN_STRING
-        board.check_if_final_state()
         board.print()
 
 
