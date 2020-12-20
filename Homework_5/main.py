@@ -1,5 +1,6 @@
 import pandas as pd
 from numpy import log as ln
+from statistics import mean
 
 def calculate_probabilities(data):
     probabilities = {'democrat': 0, 'republican': 0}
@@ -101,13 +102,14 @@ def print_output(accuracies):
     for accuracy in accuracies:
         accuracy_in_percents = round((accuracy[0] / accuracy[1] * 100))
         print('Accuracy: ' + str(accuracy[0]) + '/' + str(accuracy[1]) + '---->' + str(accuracy_in_percents) + '%')
+    average_accuracy_percents = round(mean([i[0]/i[1] for i in accuracies]) * 100)
+    print('Average: ' + str(average_accuracy_percents) + '%')
 
 def read_data_from_file(filename):
     columns = ['class', 'col1', 'col2', 'col3', 'col4', 'col5', 'col6', 'col7', 'col8', 'col9', 'col10', 'col11', 'col12', 'col13', 'col14', 'col15', 'col16']
     data = pd.read_csv(filename, names=columns)
     return data
-
-        
+   
 def main():
     filename = "data.csv"
     data = read_data_from_file(filename)
