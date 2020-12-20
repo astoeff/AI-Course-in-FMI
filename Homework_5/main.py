@@ -2,7 +2,6 @@ import pandas as pd
 from numpy import log as ln
 
 def calculate_probabilities(data):
-    cols = list(data.columns)
     probabilities = {'democrat': 0, 'republican': 0}
     for i in range(1,17):
         probabilities['democrat_col'+str(i)+'_y'] = 0
@@ -49,6 +48,26 @@ def calculate_probabilities(data):
 def shuffle_data(data):
     return data.sample(frac=1)
 
+#use one loop for both probabilities
+def calculate_democrat_and_republican_probability(probabilities, row_features):
+    democrat_probability = 0
+    republican_probability = 0
+    for h in range(1,17):
+        democrat_probability +=  ln(probabilities['democrat_col'+str(h)+'_'+row_features[h-1]])
+        republican_probability += ln(probabilities['republican_col'+str(h)+'_'+row_features[h-1]])
+    return democrat_probability, republican_probability
+
+def select_probable_class(democrat_probability, republican_probability):
+    return 'democrat' if democrat_probability > republican_probability else 'republican'
+
+def update_accuracy_depending_on_probable_class(accuracies, probable_class, row_class, i):
+    prev_accuracy_value = accuracies[i]
+    new_accuracy_value = (prev_accuracy_value[0], prev_accuracy_value[1] + 1)
+    if probable_class == row_class:
+            new_accuracy_value = (prev_accuracy_value[0] + 1, prev_accuracy_value[1] + 1)
+    accuracies[i] = new_accuracy_value
+    return accuracies
+
 def ten_fold_cross_validation(data, data_len):
     elements_per_set = int(data_len / 10)
     accuracies = [(0, 0)] * 10
@@ -62,18 +81,9 @@ def ten_fold_cross_validation(data, data_len):
             row_as_list = list(set_for_test.iloc[j])
             row_class = row_as_list[0]
             row_features = row_as_list[1:]
-            democrat_probability = 0
-            republican_probability = 0
-            for h in range(1,17):
-                democrat_probability +=  ln(probabilities['democrat_col'+str(h)+'_'+row_features[h-1]])
-                republican_probability += ln(probabilities['republican_col'+str(h)+'_'+row_features[h-1]])
-            probable_class = 'democrat' if democrat_probability > republican_probability else 'republican'
-            
-            prev_accuracy_value = accuracies[i]
-            new_accuracy_value = (prev_accuracy_value[0], prev_accuracy_value[1] + 1)
-            if probable_class == row_class:
-                new_accuracy_value = (prev_accuracy_value[0] + 1, prev_accuracy_value[1] + 1)
-            accuracies[i] = new_accuracy_value
+            democrat_probability, republican_probability = calculate_democrat_and_republican_probability(probabilities, row_features)
+            probable_class = select_probable_class(democrat_probability, republican_probability)
+            accuracies = update_accuracy_depending_on_probable_class(accuracies, probable_class, row_class, i)
 
     set_for_test = data.iloc[9*elements_per_set:]
     set_for_learning = data.iloc[:9*elements_per_set]
@@ -82,18 +92,9 @@ def ten_fold_cross_validation(data, data_len):
             row_as_list = list(set_for_test.iloc[j])
             row_class = row_as_list[0]
             row_features = row_as_list[1:]
-            democrat_probability = 0
-            republican_probability = 0
-            for h in range(1,17):
-                democrat_probability +=  ln(probabilities['democrat_col'+str(h)+'_'+row_features[h-1]])
-                republican_probability += ln(probabilities['republican_col'+str(h)+'_'+row_features[h-1]])
-            probable_class = 'democrat' if democrat_probability > republican_probability else 'republican'
-            
-            prev_accuracy_value = accuracies[9]
-            new_accuracy_value = (prev_accuracy_value[0], prev_accuracy_value[1] + 1)
-            if probable_class == row_class:
-                new_accuracy_value = (prev_accuracy_value[0] + 1, prev_accuracy_value[1] + 1)
-            accuracies[9] = new_accuracy_value
+            democrat_probability, republican_probability = calculate_democrat_and_republican_probability(probabilities, row_features)
+            probable_class = select_probable_class(democrat_probability, republican_probability)
+            accuracies = update_accuracy_depending_on_probable_class(accuracies, probable_class, row_class, 9)
     return accuracies
 
 def print_output(accuracies):
