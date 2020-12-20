@@ -1,4 +1,5 @@
 import pandas as pd
+from numpy import log as ln
 
 def calculate_probabilities(data):
     cols = list(data.columns)
@@ -61,15 +62,13 @@ def ten_fold_cross_validation(data, data_len):
             row_as_list = list(set_for_test.iloc[j])
             row_class = row_as_list[0]
             row_features = row_as_list[1:]
-            democrat_probability = 1
-            republican_probability = 1
+            democrat_probability = 0
+            republican_probability = 0
             for h in range(1,17):
-                democrat_probability *=  probabilities['democrat_col'+str(h)+'_'+row_features[h-1]]
-                republican_probability *= probabilities['republican_col'+str(h)+'_'+row_features[h-1]]
+                democrat_probability +=  ln(probabilities['democrat_col'+str(h)+'_'+row_features[h-1]])
+                republican_probability += ln(probabilities['republican_col'+str(h)+'_'+row_features[h-1]])
             probable_class = 'democrat' if democrat_probability > republican_probability else 'republican'
-            # if probable_class != row_class:
-            #     print(probable_class + '<----------->' + row_class)
-            #     print(j)
+            
             prev_accuracy_value = accuracies[i]
             new_accuracy_value = (prev_accuracy_value[0], prev_accuracy_value[1] + 1)
             if probable_class == row_class:
@@ -83,15 +82,13 @@ def ten_fold_cross_validation(data, data_len):
             row_as_list = list(set_for_test.iloc[j])
             row_class = row_as_list[0]
             row_features = row_as_list[1:]
-            democrat_probability = 1
-            republican_probability = 1
+            democrat_probability = 0
+            republican_probability = 0
             for h in range(1,17):
-                democrat_probability *=  probabilities['democrat_col'+str(h)+'_'+row_features[h-1]]
-                republican_probability *= probabilities['republican_col'+str(h)+'_'+row_features[h-1]]
+                democrat_probability +=  ln(probabilities['democrat_col'+str(h)+'_'+row_features[h-1]])
+                republican_probability += ln(probabilities['republican_col'+str(h)+'_'+row_features[h-1]])
             probable_class = 'democrat' if democrat_probability > republican_probability else 'republican'
-            # if probable_class != row_class:
-            #     print(probable_class + '<----------->' + row_class)
-            #     print(j)
+            
             prev_accuracy_value = accuracies[9]
             new_accuracy_value = (prev_accuracy_value[0], prev_accuracy_value[1] + 1)
             if probable_class == row_class:
