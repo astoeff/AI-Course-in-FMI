@@ -8,6 +8,7 @@ BOARD_FINAL_STATE_CHAR = '.'
 
 
 INITIAL_VERSION_OF_BOARD = [[EMPTY_POSITION_ON_BOARD_CHAR for i in range(3)] for i in range(3)]
+#INITIAL_VERSION_OF_BOARD = [['X','O','X'], ['_','_','X'], ['_', '_', '_']]
 
 UPPER_LABEL_OF_PRINTING_BOARD_STRING = "  0 1 2"
 

@@ -1,8 +1,9 @@
 from copy import deepcopy
-from termcolor import colored
 
-from constants import PLAYER_IS_FIRST_VALUE, COMPUTER_IS_FIRST_VALUE, INITIAL_VERSION_OF_BOARD, EMPTY_POSITION_ON_BOARD_CHAR, PLAYER_SIGN_ON_BOARD_CHAR, BOARD_FINAL_STATE_CHAR, PLAYER_IS_ON_TURN_STRING, COMPUTER_IS_ON_TURN_STRING
 from board import Board
+from constants import (PLAYER_IS_FIRST_VALUE, COMPUTER_IS_FIRST_VALUE, INITIAL_VERSION_OF_BOARD,
+                       EMPTY_POSITION_ON_BOARD_CHAR, PLAYER_SIGN_ON_BOARD_CHAR, COMPUTER_SIGN_ON_BOARD_CHAR, 
+                       PLAYER_IS_ON_TURN_STRING, COMPUTER_IS_ON_TURN_STRING)
 
 
 def read_who_is_first_input_from_console():
@@ -15,6 +16,15 @@ def read_who_is_first_input_from_console():
 
 def check_if_player_is_first(inputted_value):
     return inputted_value == PLAYER_IS_FIRST_VALUE
+
+def select_first_on_turn():
+    inputted_value = read_who_is_first_input_from_console()
+    is_player_first = check_if_player_is_first(inputted_value)    
+    if is_player_first:
+        current_player_on_turn = PLAYER_IS_ON_TURN_STRING
+    else:
+        current_player_on_turn = COMPUTER_IS_ON_TURN_STRING
+    return current_player_on_turn
 
 def read_player_position_input_from_console():
     inputted_value = str(input('Enter position in format x,y, example: 0, 2: ' ))
@@ -33,123 +43,95 @@ def player_moves(board):
     board.update(position, PLAYER_SIGN_ON_BOARD_CHAR)
     return board
 
-def max_alpha_beta(board, alpha, beta):
+def max_alpha_beta(board, alpha, beta, init_depth, best_depth):
     maxv = -2
     px = None
     py = None
 
     result = board.is_end()
 
-    if result == 'X':
-        return (-1, 0, 0)
-    elif result == 'O':
-        return (1, 0, 0)
-    elif result == '_':
-        return (0, 0, 0)
+    if result == PLAYER_SIGN_ON_BOARD_CHAR:
+        return (-1, 0, 0, init_depth, best_depth)
+    elif result == COMPUTER_SIGN_ON_BOARD_CHAR:
+        return (1, 0, 0, init_depth, best_depth)
+    elif result == EMPTY_POSITION_ON_BOARD_CHAR:
+        return (0, 0, 0, init_depth, best_depth)
 
-    for i in range(0, 3):
-        for j in range(0, 3):
-            if board.board[i][j] == '_':
-                board.board[i][j] = 'O'
-                (m, min_i, in_j) = min_alpha_beta(board, alpha, beta)
-                if m > maxv:
+    for i in reversed(range(0, 3)):
+        for j in reversed(range(0, 3)):
+            if board.board[i][j] == EMPTY_POSITION_ON_BOARD_CHAR:
+                depth = init_depth
+                board.board[i][j] = COMPUTER_SIGN_ON_BOARD_CHAR
+                (m, min_i, in_j, depth, best_depth) = min_alpha_beta(board, alpha, beta, depth + 1, best_depth)
+                if m > maxv or (m == maxv and depth < best_depth):
                     maxv = m
+                    best_depth = depth 
                     px = i
                     py = j
-                board.board[i][j] = '_'
+                board.board[i][j] = EMPTY_POSITION_ON_BOARD_CHAR
 
-                # Next two ifs in Max and Min are the only difference between regular algorithm and minimax
+                #pruning
                 if maxv >= beta:
-                    return (maxv, px, py)
+                    return (maxv, px, py, depth, best_depth)
 
                 if maxv > alpha:
                     alpha = maxv
 
-    return (maxv, px, py)
+    return (maxv, px, py, depth, best_depth)
 
-def min_alpha_beta(board, alpha, beta):
+def min_alpha_beta(board, alpha, beta, init_depth, best_depth):
     minv = 2
-
     qx = None
     qy = None
 
     result = board.is_end()
 
-    if result == 'X':
-        return (-1, 0, 0)
-    elif result == 'O':
-        return (1, 0, 0)
-    elif result == '_':
-        return (0, 0, 0)
+    if result == PLAYER_SIGN_ON_BOARD_CHAR:
+        return (-1, 0, 0, init_depth, best_depth)
+    elif result == COMPUTER_SIGN_ON_BOARD_CHAR:
+        return (1, 0, 0, init_depth, best_depth)
+    elif result == EMPTY_POSITION_ON_BOARD_CHAR:
+        return (0, 0, 0, init_depth, best_depth)
 
-    for i in range(0, 3):
-        for j in range(0, 3):
-            if board.board[i][j] == '_':
-                board.board[i][j] = 'X'
-                (m, max_i, max_j) = max_alpha_beta(board, alpha, beta)
-                if m < minv:
+    for i in (range(0, 3)):
+        for j in (range(0, 3)):
+            if board.board[i][j] == EMPTY_POSITION_ON_BOARD_CHAR:
+                depth = init_depth
+                board.board[i][j] = PLAYER_SIGN_ON_BOARD_CHAR
+                (m, max_i, max_j, depth, best_depth) = max_alpha_beta(board, alpha, beta, depth + 1, best_depth)
+                if m < minv or (m == minv and depth < best_depth):
                     minv = m
+                    best_depth = depth
                     qx = i
                     qy = j
-                board.board[i][j] = '_'
+                board.board[i][j] = EMPTY_POSITION_ON_BOARD_CHAR
 
+                #pruning
                 if minv <= alpha:
-                    return (minv, qx, qy)
+                    return (minv, qx, qy, depth, best_depth)
 
                 if minv < beta:
                     beta = minv
 
-    return (minv, qx, qy)
+    return (minv, qx, qy, depth, best_depth)
 
 def main():
-    # b = Board([['X', '_', '_'], ['_', 'X', '_'], ['_', '_', 'X']])
-    # print(b.check_if_final_state())
-    inputted_value = read_who_is_first_input_from_console()
-    is_player_first = check_if_player_is_first(inputted_value)
-    initial_board_list_of_values = INITIAL_VERSION_OF_BOARD
-    board = Board(initial_board_list_of_values)
-    # board = Board([['_', '_', '_'], ['X', 'X', 'O'], ['O', 'O', 'O']])
-    # board = Board([['X', 'X', 'X'], ['O', 'O', '_'], ['O', '_', '_']])
-    # board_copy = deepcopy(board)
-    # board_copy.board[0][0] = 'Y'
-    # board.print()
-    # board_copy.print()
-    current_player_on_turn = None
-    if is_player_first:
-        current_player_on_turn = PLAYER_IS_ON_TURN_STRING
-    else:
-        current_player_on_turn = COMPUTER_IS_ON_TURN_STRING
-
-    board.print()
+    current_player_on_turn = select_first_on_turn()
+    board = Board(INITIAL_VERSION_OF_BOARD)
     while True:
+        board.print()
         result = board.is_end()
 
-        # Printing the appropriate message if the game has ended
         if result != None:
-            if result == 'X':
-                print('The winner is X!')
-            elif result == 'O':
-                print('The winner is O!')
-            elif result == '.':
-                print("It's a tie!")
-
-            # self.initialize_game()
-            return
+            break
 
         if current_player_on_turn == PLAYER_IS_ON_TURN_STRING:
-            board = player_moves(board)
+            player_moves(board)
             current_player_on_turn = COMPUTER_IS_ON_TURN_STRING
         else:
-            # print('BOARD FOR BOT')
-            # board.print()
-            # print('----------------------------')
-            board_copy = deepcopy(board)
-            (m, px, py) = max_alpha_beta(board_copy, -2, 2)
-            # print(px, py)
-            board.update((px, py), 'O')
-            # board.board[px][py] = 'O'
+            (m, px, py, d, bd) = max_alpha_beta(board, -2, 2, 0, 11)
+            board.update((px, py), COMPUTER_SIGN_ON_BOARD_CHAR)
             current_player_on_turn = PLAYER_IS_ON_TURN_STRING
-        board.print()
 
 
 if __name__ == '__main__':
