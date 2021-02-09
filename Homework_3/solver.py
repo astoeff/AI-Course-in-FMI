@@ -14,7 +14,7 @@ def find_best_path(dots):
 
 def main():
     '''Enter dots (list of tuples with len < 10) to calculate all permutations and find that with best distance'''
-    dots_tuples = [(5, 0), (5, 2), (5, 4), (5, 1), (0, 2), (4, 3)]
+    dots_tuples = [(4, 0), (1, 2), (2, 2), (0, 2), (0, 3)]
     dots = [Dot(i) for i in dots_tuples]
     find_best_path(dots)
 

@@ -6,8 +6,8 @@ from dot import Dot
 from route import Route
 from constants import (MAX_N, MAX_N_TO_BE_OPTIMISED, 
                        SEQUENTIVE_EQUAL_DISTANCE_OCCURANCES_FOR_EXTREMUM_REACHED, TIMES_OF_EXECUTION_OF_ALGORITHM,
-                       TENTH_STEP_OF_EXECUTION_COUNT, TWENTIETH_STEP_OF_EXECUTION_COUNT,
-                       THIRTIETH_STEP_OF_EXECUTION_COUNT, FOURTIETH_STEP_OF_EXECUTION_COUNT)
+                       TENTH_STEP_OF_EXECUTION_COUNT, HUNDRED_STEP_OF_EXECUTION_COUNT,
+                       TWO_HUNDRED_STEP_OF_EXECUTION_COUNT, THREE_HUNDRED_STEP_OF_EXECUTION_COUNT)
 
 def generate_n_different_random_dots(n):
     already_existing_dots_dict = {}
@@ -25,6 +25,7 @@ def generate_n_different_random_dots(n):
             #Do not do anything, the dot is already generated
             pass
 
+    print([i.coordinates for i in generated_dots])
     return generated_dots
 
 def read_input_parameters():
@@ -35,7 +36,7 @@ def read_input_parameters():
 
 def generate_initial_route(n):
     dots = generate_n_different_random_dots(n)
-    #uncomment for shiwing initial dots when using solver
+    #uncomment for shizwing initial dots when using solver
     #print([dot.coordinates for dot in dots])
 
     initial_route = Route(dots)
@@ -84,17 +85,35 @@ def crossover(parent_1, parent_2, n):
 
     return child_1, child_2
 
-def reproduce(sample_of_individuals, n):
+def mutation(individual, n):
+    random_gene_from_first_half_position = random.randint(0, int(n / 2))
+    random_gene_from_second_half_position = random.randint(int(n / 2), n - 1)
+    individual.dots[random_gene_from_first_half_position], individual.dots[random_gene_from_second_half_position] = individual.dots[random_gene_from_second_half_position], individual.dots[random_gene_from_first_half_position]
+
+def reproduce(sample_of_individuals, number_of_individuals_in_sample, n):
     #get the first 25% from the sample for reproduction
-    number_of_individuals_preserved = int(n / 4 if n % 2 == 0 else n / 4 + 1)
+    number_of_individuals_preserved = int(number_of_individuals_in_sample / 4 if number_of_individuals_in_sample % 2 == 0 else number_of_individuals_in_sample / 4 + 1)
     individuals_preserved_for_next_generation = sample_of_individuals[:number_of_individuals_preserved]
     
-    number_of_children_needed = n - number_of_individuals_preserved
+    number_of_children_needed = number_of_individuals_in_sample - number_of_individuals_preserved
     index_of_pair_of_parents = 0
     children_reproduced = []
     while number_of_children_needed > 0:
         #create 2 children from pair
         children_from_crossover = crossover(sample_of_individuals[index_of_pair_of_parents], sample_of_individuals[index_of_pair_of_parents + 1], n)
+
+        #mutation of first child
+        random_number = random.randint(1, 100)
+        condition_for_mutation = random_number == 1 or random_number == 2 or random_number == 3
+        if condition_for_mutation:
+            mutation(children_from_crossover[0], n)
+
+        #mutation of second child
+        random_number = random.randint(1, 100)
+        condition_for_mutation = random_number == 1 or random_number == 2 or random_number == 3
+        if condition_for_mutation:
+            mutation(children_from_crossover[1], n)
+
         children_reproduced.append(children_from_crossover[0])
         children_reproduced.append(children_from_crossover[1])
         
@@ -106,22 +125,20 @@ def reproduce(sample_of_individuals, n):
 
     next_generation_individuals = []
     for i in individuals_preserved_for_next_generation:
-        d = [do for do in i.dots]
-        r = Route(d)
-        next_generation_individuals.append(r)
+        next_generation_individuals.append(i)
 
     for i in children_reproduced:
         next_generation_individuals.append(i)
 
     return next_generation_individuals
 
-def find_best_individual(sample_of_individuals, n):
+def find_best_individual(sample_of_individuals, number_of_individuals_in_sample, n):
     best_individual = sample_of_individuals[0]
     best_distance = best_individual.distance
 
     optimisation_condition = False
 
-    #uncomment if you want to not use genetic algorithm for n <= 8
+    #uncomment if you want to NOT use genetic algorithm for n <= 8
     #optimisation_condition = n <= MAX_N_TO_BE_OPTIMISED
 
     if optimisation_condition:
@@ -133,7 +150,7 @@ def find_best_individual(sample_of_individuals, n):
         count_for_execution_of_algorithm = TIMES_OF_EXECUTION_OF_ALGORITHM
         is_best_result_achieved = False
         while not is_best_result_achieved:
-            next_generation = reproduce(sample_of_individuals, n)
+            next_generation = reproduce(sample_of_individuals, number_of_individuals_in_sample, n)
             next_generation.sort(key=lambda x: x.distance)
             next_generation_best_individual = next_generation[0]
             next_generation_best_distance = next_generation_best_individual.distance
@@ -144,36 +161,54 @@ def find_best_individual(sample_of_individuals, n):
                 current_number_of_sequentive_times_with_equal_best_distance = 0
 
             sample_of_individuals = next_generation
-            best_individual = next_generation_best_individual
-            best_distance = next_generation_best_distance
+            if next_generation_best_distance < best_distance:
+                best_individual = next_generation_best_individual
+                best_distance = next_generation_best_distance
+            
             count_for_execution_of_algorithm -= 1
             is_best_result_achieved = (current_number_of_sequentive_times_with_equal_best_distance == number_of_sequentive_times_with_equal_best_distance_for_extremum_reached)\
                               or count_for_execution_of_algorithm == 0
             #uncomment for showing best distance for each generation
-            #print(best_distance)
+            # print('#' + str(1000 - count_for_execution_of_algorithm) + ' ' + str(best_distance))
 
             #step 10
             if count_for_execution_of_algorithm == TENTH_STEP_OF_EXECUTION_COUNT:
                 print('Step 10: ', best_distance)
             #step 20
-            elif count_for_execution_of_algorithm == TWENTIETH_STEP_OF_EXECUTION_COUNT:
-                print('Step 20: ', best_distance)
+            elif count_for_execution_of_algorithm == HUNDRED_STEP_OF_EXECUTION_COUNT:
+                print('Step 100: ', best_distance)
             #step 30
-            elif count_for_execution_of_algorithm == THIRTIETH_STEP_OF_EXECUTION_COUNT:
-                print('Step 30: ', best_distance)
+            elif count_for_execution_of_algorithm == TWO_HUNDRED_STEP_OF_EXECUTION_COUNT:
+                print('Step 200: ', best_distance)
             #step 40
-            elif count_for_execution_of_algorithm == FOURTIETH_STEP_OF_EXECUTION_COUNT:
-                print('Step 40: ', best_distance)
+            elif count_for_execution_of_algorithm == THREE_HUNDRED_STEP_OF_EXECUTION_COUNT:
+                print('Step 300: ', best_distance)
 
     return best_individual
     
 def main():
-    n = read_input_parameters()
+    condition_for_tests = False
+    if condition_for_tests:
+        '''tes with 4'''
+        # n = 4
+        # initial_route = Route([Dot(i) for i in [(3, 2), (2, 0), (2, 3), (1, 1)]])
 
-    initial_route = generate_initial_route(n)
+        '''tes with 5'''
+        n = 5
+        initial_route = Route([Dot(i) for i in [(4, 0), (1, 2), (2, 2), (0, 2), (0, 3)]])
+    else:
+        n = read_input_parameters()
+
+        initial_route = generate_initial_route(n)
+
 
     #formula calculating how many individuals to be in sample
-    number_of_individuals_in_sample = pow(n, 2) if n > MAX_N_TO_BE_OPTIMISED else factorial(n)
+    number_of_individuals_in_sample = 100
+    # if n > 50:
+    #     number_of_individuals_in_sample = int(pow(n, 2) / 8)
+
+    # elif n > 70:
+    #     number_of_individuals_in_sample = n * 5
 
     #create diverse sample
     sample_of_individuals = create_diverse_sample_from_random_individuals(number_of_individuals_in_sample, initial_route)
@@ -182,7 +217,7 @@ def main():
     sample_of_individuals.sort(key=lambda x: x.distance)
 
     #execute algorithm
-    best_individual = find_best_individual(sample_of_individuals, n)
+    best_individual = find_best_individual(sample_of_individuals, number_of_individuals_in_sample, n)
 
     #Output
     print('Best distance', best_individual.distance)
