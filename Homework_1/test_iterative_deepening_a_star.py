@@ -219,3 +219,83 @@ class TestIterativeDeepeningAStar(unittest.TestCase):
 
         self.assertEqual(steps, expected_steps)
         self.assertEqual(directions, expected_directions)
+
+    def test_with_first_example_from_presentations(self):
+        puzzle_board = [[6, 5, 3], [2, 4, 8], [7, 0, 1]]
+        position_of_zero_in_given_puzzle = (2, 1)
+        position_of_zero_in_solved_puzzle = -1
+        puzzle = Puzzle_node(puzzle_board, position_of_zero_in_given_puzzle)
+        final_state_board = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
+        position_of_zero_in_final_state = (2, 2)
+        final_state = Puzzle_node(final_state_board, position_of_zero_in_final_state)
+
+        steps, directions = iterative_deepening_a_star(puzzle, final_state, final_state.tile_number_position_dict)
+
+        expected_steps = 21
+        #list of reversed directions
+        expected_directions = ['left', 'down', 'down', 'right', 'right', 'up', 'left', 'up',
+                               'right', 'down', 'left', 'down', 'left', 'up', 'right', 'down',
+                               'right', 'up', 'up', 'left', 'left']
+
+        self.assertEqual(steps, expected_steps)
+        self.assertEqual(directions, expected_directions[::-1])
+
+    def test_with_second_example_from_presentations(self):
+        puzzle_board = [[2, 3, 6], [1, 5, 8], [4, 7, 0]]
+        position_of_zero_in_given_puzzle = (2, 2)
+        position_of_zero_in_solved_puzzle = -1
+        puzzle = Puzzle_node(puzzle_board, position_of_zero_in_given_puzzle)
+        final_state_board = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
+        position_of_zero_in_final_state = (2, 2)
+        final_state = Puzzle_node(final_state_board, position_of_zero_in_final_state)
+
+        steps, directions = iterative_deepening_a_star(puzzle, final_state, final_state.tile_number_position_dict)
+
+        expected_steps = 8
+        #list of reversed directions
+        expected_directions = ['down', 'down', 'right', 'right', 'up', 'up', 'left', 'left']
+
+        self.assertEqual(steps, expected_steps)
+        self.assertEqual(directions, expected_directions[::-1])
+
+    def test_with_third_example_from_presentations(self):
+        puzzle_board = [[8, 6, 7], [2, 5, 4], [3, 0, 1]]
+        position_of_zero_in_given_puzzle = (2, 1)
+        position_of_zero_in_solved_puzzle = -1
+        puzzle = Puzzle_node(puzzle_board, position_of_zero_in_given_puzzle)
+        final_state_board = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
+        position_of_zero_in_final_state = (2, 2)
+        final_state = Puzzle_node(final_state_board, position_of_zero_in_final_state)
+
+        steps, directions = iterative_deepening_a_star(puzzle, final_state, final_state.tile_number_position_dict)
+
+        expected_steps = 31
+        #list of reversed directions
+        expected_directions = ['left', 'down', 'down', 'right', 'right', 'up', 'up', 'left',
+                               'left', 'down', 'down', 'right', 'up', 'right', 'up', 'left', 'left', 'down', 'right', 'down',
+                               'left', 'up', 'right', 'down', 'right', 'up', 'up', 'left', 'down', 'left', 'up']
+
+        self.assertEqual(steps, expected_steps)
+        self.assertEqual(directions, expected_directions[::-1])
+
+    def test_with_fourth_example_from_presentations(self):
+        puzzle_board = [[6, 4, 7], [8, 5, 0], [3, 2, 1]]
+        position_of_zero_in_given_puzzle = (1, 2)
+        position_of_zero_in_solved_puzzle = -1
+        puzzle = Puzzle_node(puzzle_board, position_of_zero_in_given_puzzle)
+        final_state_board = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
+        position_of_zero_in_final_state = (2, 2)
+        final_state = Puzzle_node(final_state_board, position_of_zero_in_final_state)
+
+        steps, directions = iterative_deepening_a_star(puzzle, final_state, final_state.tile_number_position_dict)
+
+        expected_steps = 31
+        #list of reversed directions
+        expected_directions = ['up', 'right', 'right', 'down', 'down',
+                               'left', 'left', 'up', 'up', 'right', 'right',
+                               'down', 'left', 'down', 'left', 'up', 'up', 'right',
+                               'right', 'down', 'left', 'up', 'right', 'down', 'down',
+                               'left', 'left', 'up', 'right', 'up', 'left']
+
+        self.assertEqual(steps, expected_steps)
+        self.assertEqual(directions, expected_directions[::-1])

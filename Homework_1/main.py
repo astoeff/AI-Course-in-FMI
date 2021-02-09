@@ -97,6 +97,7 @@ def iterative_deepening_a_star(root_puzzle, final_state, final_state_dict_values
                 if  child.calculate_heuristic(final_state_dict_values) < limit and child not in visited:
                     stack.append(child)
                     visited.append(child)
+
         limit = next_limit
 
     father = final_state.father_node
